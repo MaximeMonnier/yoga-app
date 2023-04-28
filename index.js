@@ -24,7 +24,28 @@ pageContent: function (title, content, btn) {
 handleEventMinutes: function() {
     document.querySelectorAll('input[type="number"]').forEach((input) => {
         input.addEventListener('input', (e) => {
-            console.log(e);
+            exerciceArray.map((exo) => {
+                if(exo.pic == e.target.id) {
+                    exo.min = parseInt(e.target.value);
+                    console.log(exerciceArray);
+                }
+            })
+        })
+    })
+},
+
+handleEventArrow: function () {
+    document.querySelectorAll('.arrow').forEach((arrow) => {
+        arrow.addEventListener("click", (e) => {
+            let position = 0;
+            exerciceArray.map((exo) => {
+                if (exo.pic == e.target.dataset.pic && position !== 0){
+                    [exerciceArray[position], exerciceArray[position - 1]] = [exerciceArray[position - 1], exerciceArray[position],];
+                    page.lobby();
+                } else {
+                    position ++;
+                }
+            })
         })
     })
 }
@@ -52,7 +73,8 @@ const page = {
             "<ul>" + marArray + "</ul>",
             "<button id='start'>Commencer<i class='fi fi-br-play'></i></button>"
         )
-        utils.handleEventMinutes();    
+        utils.handleEventMinutes();
+        utils.handleEventArrow();    
     },
 
     routine: function(){
