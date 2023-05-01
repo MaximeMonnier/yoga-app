@@ -1,16 +1,26 @@
 const main = document.querySelector("main");
-let exerciceArray = [
-{ pic: 0, min: 1 },
-{ pic: 1, min: 1 },
-{ pic: 2, min: 1 },
-{ pic: 3, min: 1 },
-{ pic: 4, min: 1 },
-{ pic: 5, min: 1 },
-{ pic: 6, min: 1 },
-{ pic: 7, min: 1 },
-{ pic: 8, min: 1 },
-{ pic: 9, min: 1 },
-];
+const basicArray = [
+    { pic: 0, min: 1 },
+    { pic: 1, min: 1 },
+    { pic: 2, min: 1 },
+    { pic: 3, min: 1 },
+    { pic: 4, min: 1 },
+    { pic: 5, min: 1 },
+    { pic: 6, min: 1 },
+    { pic: 7, min: 1 },
+    { pic: 8, min: 1 },
+    { pic: 9, min: 1 },
+    ];
+let exerciceArray = [];
+
+// Get stored exercice array
+(() => {
+    if(localStorage.exercices) {
+        exerciceArray = localStorage.exercices
+    } else {
+        exerciceArray = basicArray;
+    }
+})();
 
 class Exercice {}
 
@@ -27,7 +37,7 @@ handleEventMinutes: function() {
             exerciceArray.map((exo) => {
                 if(exo.pic == e.target.id) {
                     exo.min = parseInt(e.target.value);
-                    console.log(exerciceArray);
+                    this.store(); 
                 }
             })
         })
@@ -42,13 +52,36 @@ handleEventArrow: function () {
                 if (exo.pic == e.target.dataset.pic && position !== 0){
                     [exerciceArray[position], exerciceArray[position - 1]] = [exerciceArray[position - 1], exerciceArray[position],];
                     page.lobby();
+                    this.store();
                 } else {
                     position ++;
                 }
             })
         })
     })
+},
+
+deleteItem: function () {
+    document.querySelectorAll(".deleteBtn").forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            const newArr = exerciceArray.filter((exo) => exo.pic != e.target.dataset.pic);
+            exerciceArray = newArr;
+            page.lobby(); 
+            this.store();
+        })
+    })
+},
+
+reboot: function () {
+    exerciceArray = basicArray;
+    page.lobby();
+    this.store();
+},
+
+store: function() {
+    localStorage.exercices = JSON.stringify(exerciceArray);
 }
+
 };
 
 const page = {
@@ -69,12 +102,14 @@ const page = {
         .join("");
 
         utils.pageContent(
-            "Paramétrage <i class=s'fi fi-rr-refresh'></i>",
+            "Paramétrage <i id='reboot' class='fi fi-rr-refresh'></i>",
             "<ul>" + marArray + "</ul>",
             "<button id='start'>Commencer<i class='fi fi-br-play'></i></button>"
         )
         utils.handleEventMinutes();
-        utils.handleEventArrow();    
+        utils.handleEventArrow();
+        utils.deleteItem();
+        reboot.addEventListener('click', () => utils.reboot());    
     },
 
     routine: function(){
